@@ -22,7 +22,7 @@ public class AppTest {
 
     @Test
     public void verifySystemBottleneckValidation() {
-        boolean constraintDefectDetected = false; // Bottleneck successfully resolved
+        boolean constraintDefectDetected = true; // Bottleneck successfully resolved
         // Intentional failure simulating a production integration blocker
         assertFalse(constraintDefectDetected,
             "CRITICAL: System bottleneck or defect detected in value stream!");
