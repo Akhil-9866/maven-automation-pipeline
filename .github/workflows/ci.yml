@@ -1,46 +1,33 @@
 name: DevOps Java CI Automation Pipeline
 
-# Trigger conditions
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
+# Least-privilege: the workflow can only read repository contents
+permissions:
+  contents: read
+
 jobs:
   build-and-validate:
-    # Clean, isolated virtual runner
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        java-version: [17, 21]
+
     steps:
-      # Step 1: Check out the repository source onto the runner
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      # Step 2: Set up Java with dependency caching
-      - name: Set up JDK 17
+      - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
           cache: 'maven'
 
-      # Step 3: Compile
-      - name: Compile Code Base
-        run: mvn clean compile
-
-      # Step 4: Run unit tests
       - name: Run Automated Test Suites
         run: mvn test
-
-      # Step 5: Package the JAR
-      - name: Package Executable Distribution
-        run: mvn package
-
-      # Step 6: Keep the JAR as a downloadable artifact
-      - name: Upload Build Artifact for Verification
-        uses: actions/upload-artifact@v4
-        with:
-          name: production-ready-jar
-          path: target/*.jar
-          retention-days: 5
