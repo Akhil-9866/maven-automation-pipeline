@@ -31,3 +31,27 @@ jobs:
 
       - name: Run Automated Test Suites
         run: mvn test
+
+  # Staging Deployment Workflow Segment
+  deploy-staging:
+    needs: build-and-validate
+    # Only deploy on pushes to main, not on pull requests
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    # This line makes the job pause for the reviewers set on "staging"
+    environment: staging
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Staging Container
+        run: |
+          echo "Approval granted! Deploying to staging stack..."
+          docker compose up -d
+
+      - name: Verify Staging Deployment
+        run: |
+          sleep 3
+          docker compose ps
+          curl -s http://localhost:8085
